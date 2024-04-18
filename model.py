@@ -96,8 +96,11 @@ class PixelCNN(nn.Module):
         self.nin_out = nin(nr_filters, num_mix * nr_logistic_mix)
         self.init_padding = None
 
+        #embedding
+        self.embedding = nn.Embedding(4, nr_filters) # 4 classes, nr_filters dimensions
 
-    def forward(self, x, sample=False):
+
+    def forward(self, x, labels, sample=False):
         # similar as done in the tf repo :
         if self.init_padding is not sample:
             xs = [int(y) for y in x.size()]
@@ -137,6 +140,9 @@ class PixelCNN(nn.Module):
             if i != 2 :
                 u  = self.upsize_u_stream[i](u)
                 ul = self.upsize_ul_stream[i](ul)
+        # add output embedding for classification
+        
+        ul = ul + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
 
         x_out = self.nin_out(F.elu(ul))
 

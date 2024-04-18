@@ -12,6 +12,7 @@ from tqdm import tqdm
 from pprint import pprint
 import argparse
 from pytorch_fid.fid_score import calculate_fid_given_paths
+from classification_evaluation import classifier
 
 
 def train_or_test(model, data_loader, optimizer, loss_op, device, args, epoch, mode = 'training'):
@@ -24,9 +25,16 @@ def train_or_test(model, data_loader, optimizer, loss_op, device, args, epoch, m
     loss_tracker = mean_tracker()
     
     for batch_idx, item in enumerate(tqdm(data_loader)):
-        model_input, _ = item
+        model_input, labels = item
         model_input = model_input.to(device)
-        model_output = model(model_input)
+        
+        #convert labels to indices, if unlabelled, assign random labels
+        if mode == 'training':
+            labels = torch.tensor([my_bidict[item] for item in labels], dtype=torch.int64).to(device)
+        else:
+            labels = torch.tensor([my_bidict[item] if item in my_bidict else np.random.randint(0, len(my_bidict)) for item in labels], dtype=torch.int64).to(device)
+
+        model_output = model(model_input, labels)
         loss = loss_op(model_input, model_output)
         loss_tracker.update(loss.item()/deno)
         if mode == 'training':
@@ -37,6 +45,10 @@ def train_or_test(model, data_loader, optimizer, loss_op, device, args, epoch, m
     if args.en_wandb:
         wandb.log({mode + "-Average-BPD" : loss_tracker.get_mean()})
         wandb.log({mode + "-epoch": epoch})
+
+        acc = classifier(model, data_loader, device)
+        wandb.log({mode + "-accuracy": acc})
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -200,14 +212,14 @@ if __name__ == '__main__':
         
         # decrease learning rate
         scheduler.step()
-        train_or_test(model = model,
-                      data_loader = test_loader,
-                      optimizer = optimizer,
-                      loss_op = loss_op,
-                      device = device,
-                      args = args,
-                      epoch = epoch,
-                      mode = 'test')
+        # train_or_test(model = model,
+        #               data_loader = test_loader,
+        #               optimizer = optimizer,
+        #               loss_op = loss_op,
+        #               device = device,
+        #               args = args,
+        #               epoch = epoch,
+        #               mode = 'test')
         
         train_or_test(model = model,
                       data_loader = val_loader,
@@ -220,7 +232,10 @@ if __name__ == '__main__':
         
         if epoch % args.sampling_interval == 0:
             print('......sampling......')
-            sample_t = sample(model, args.sample_batch_size, args.obs, sample_op)
+            #make a list of random labels to sample
+            labels = [np.random.randint(0, len(my_bidict)) for _ in range(args.sample_batch_size)]
+            labels = torch.tensor(labels, dtype=torch.int64).to(device)
+            sample_t = sample(model, args.sample_batch_size, args.obs, sample_op, labels)
             sample_t = rescaling_inv(sample_t)
             save_images(sample_t, args.sample_dir)
             sample_result = wandb.Image(sample_t, caption="epoch {}".format(epoch))
