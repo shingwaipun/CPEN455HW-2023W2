@@ -69,7 +69,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batch_size', type=int,
                         default=32, help='Batch size for inference')
     parser.add_argument('-m', '--mode', type=str,
-                        default='validation', help='Mode for the dataset')
+                        default='validation', help='Mode for the dataset')  #pass in test
     
     args = parser.parse_args()
     pprint(args.__dict__)
@@ -81,7 +81,7 @@ if __name__ == '__main__':
                                                             mode = args.mode, 
                                                             transform=ds_transforms), 
                                              batch_size=args.batch_size, 
-                                             shuffle=True, 
+                                             shuffle=False, 
                                              **kwargs)
 
     #Write your code here
@@ -100,5 +100,26 @@ if __name__ == '__main__':
     print('model parameters loaded')
     acc = classifier(model = model, data_loader = dataloader, device = device)
     print(f"Accuracy: {acc}")
+
+    #coded with the use of github copilot with existing code and comments for prompts
+
+    #create a csv file with two columns, one for id, one for label, #save the file as classification.csv, should be 519 rows
+    #get the predicted labels
+    predicted_labels = []
+    for batch_idx, item in enumerate(tqdm(dataloader)):
+        model_input, categories = item
+        model_input = model_input.to(device)
+        answer = get_label(model, model_input, device)
+        predicted_labels.append(answer)
+    predicted_labels = torch.cat(predicted_labels).cpu().numpy()
+    #print(predicted_labels)
+    import pandas as pd
+    df = pd.DataFrame(predicted_labels, columns=['label'])
+    df.index.name = 'id'
+    df.to_csv('classification.csv')
+    print('classification.csv saved')
+
+    
+    
         
         

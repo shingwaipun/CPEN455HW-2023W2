@@ -133,8 +133,8 @@ class PixelCNN(nn.Module):
         ul = ul_list.pop()
 
         #add middle embeddings
-        u = u + self.embeddings(labels).unsqueeze(-1).unsqueeze(-1).expand(u.size())
-        ul = ul + self.embeddings(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
+        u = u + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(u.size())
+        ul = ul + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
 
         for i in range(3):
             # resnet block
