@@ -21,43 +21,63 @@ NUM_CLASSES = len(my_bidict)
 # And get the predicted label, which is a tensor of shape (batch_size,)
 # Begin of your code
 def get_label(model, model_input, device):
-    #run the forward pass for each class
-    #return the class with the highest probability
+    # #run the forward pass for each class
+    # #return the class with the highest probability
 
+    # outputs = torch.zeros(model_input.shape[0], NUM_CLASSES).to(device)
+    # #print(outputs.shape)
+
+    # returnvec = torch.zeros(model_input.shape[0], dtype=torch.int64).to(device)
+    # #print(returnvec.shape)
+
+    # #repeat the model input for each class
+    # x = model_input.repeat(NUM_CLASSES, 1, 1, 1)
+    # #generate labels list of length batch_size using repeat_interleave
+    # labels = torch.arange(NUM_CLASSES).repeat_interleave(model_input.shape[0]).to(device)
+
+    # output = model(x, labels)
+
+    # loss = discretized_mix_logistic_loss(x, output, isbatch=False)
+    # outputs = loss.view(-1, NUM_CLASSES)
+
+    
+    # return torch.argmin(outputs, dim=1), outputs
+
+
+    # # #iterate over the classes
+    # # for i in range(NUM_CLASSES):
+    # #     #generate labels list of length batch_size
+    # #     labels = torch.tensor([i]*model_input.shape[0], dtype=torch.int64).to(device)
+    # #     #run the forward pass
+    # #     output = model(model_input, labels)
+        
+    # #     loss = discretized_mix_logistic_loss(model_input, output, isbatch=False)
+    # #     outputs[:, i] = loss
+
+    # #get the class with the lowest loss
+    # returnvec = torch.argmin(outputs, dim=1)
+
+    # return returnvec
     outputs = torch.zeros(model_input.shape[0], NUM_CLASSES).to(device)
     #print(outputs.shape)
 
     returnvec = torch.zeros(model_input.shape[0], dtype=torch.int64).to(device)
     #print(returnvec.shape)
 
-    #repeat the model input for each class
-    x = model_input.repeat(NUM_CLASSES, 1, 1, 1)
-    #generate labels list of length batch_size using repeat_interleave
-    labels = torch.arange(NUM_CLASSES).repeat_interleave(model_input.shape[0]).to(device)
+    #iterate over the classes
+    for i in range(NUM_CLASSES):
+        #generate labels list of length batch_size
+        labels = torch.tensor([i]*model_input.shape[0], dtype=torch.int64).to(device)
+        #run the forward pass
+        output = model(model_input, labels)
 
-    output = model(x, labels)
-
-    loss = discretized_mix_logistic_loss(x, output, isbatch=False)
-    outputs = loss.view(-1, NUM_CLASSES)
-
-    
-    return torch.argmin(outputs, dim=1), outputs
-
-
-    # #iterate over the classes
-    # for i in range(NUM_CLASSES):
-    #     #generate labels list of length batch_size
-    #     labels = torch.tensor([i]*model_input.shape[0], dtype=torch.int64).to(device)
-    #     #run the forward pass
-    #     output = model(model_input, labels)
-        
-    #     loss = discretized_mix_logistic_loss(model_input, output, isbatch=False)
-    #     outputs[:, i] = loss
+        loss = discretized_mix_logistic_loss(model_input, output, isbatch=False)
+        outputs[:, i] = loss
 
     #get the class with the lowest loss
     returnvec = torch.argmin(outputs, dim=1)
 
-    return returnvec
+    return returnvec, outputs
     
     
 # End of your code
@@ -118,25 +138,4 @@ if __name__ == '__main__':
     acc = classifier(model = model, data_loader = dataloader, device = device)
     print(f"Accuracy: {acc}")
 
-    #coded with the use of github copilot with existing code and comments for prompts
-
-    #create a csv file with two columns, one for id, one for label, #save the file as classification.csv, should be 519 rows
-    #get the predicted labels
-    predicted_labels = []
-    for batch_idx, item in enumerate(tqdm(dataloader)):
-        model_input, categories = item
-        model_input = model_input.to(device)
-        answer = get_label(model, model_input, device)
-        predicted_labels.append(answer)
-    predicted_labels = torch.cat(predicted_labels).cpu().numpy()
-    #print(predicted_labels)
-    import pandas as pd
-    df = pd.DataFrame(predicted_labels, columns=['label'])
-    df.index.name = 'id'
-    df.to_csv('classification.csv')
-    print('classification.csv saved')
-
-
-    
-        
-        
+  
