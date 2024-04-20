@@ -132,6 +132,10 @@ class PixelCNN(nn.Module):
         u  = u_list.pop()
         ul = ul_list.pop()
 
+        #add middle embeddings
+        u = u + self.embeddings(labels).unsqueeze(-1).unsqueeze(-1).expand(u.size())
+        ul = ul + self.embeddings(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
+
         for i in range(3):
             # resnet block
             u, ul = self.down_layers[i](u, ul, u_list, ul_list)
@@ -140,9 +144,10 @@ class PixelCNN(nn.Module):
             if i != 2 :
                 u  = self.upsize_u_stream[i](u)
                 ul = self.upsize_ul_stream[i](ul)
+        #coded with the use of github copilot with existing code and comments for prompts
         # add output embedding for classification
         
-        ul = ul + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
+        #ul = ul + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
 
         x_out = self.nin_out(F.elu(ul))
 
