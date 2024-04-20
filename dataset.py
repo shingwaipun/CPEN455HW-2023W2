@@ -3,7 +3,7 @@ import torch
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from torchvision.io import read_image
-from torchvision.transforms import Compose, Resize
+from torchvision.transforms import Compose, Resize, RandomHorizontalFlip, RandomVerticalFlip, RandomAdjustSharpness, GaussianBlur
 from bidict import bidict
 from tqdm import tqdm
 import pandas as pd

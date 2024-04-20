@@ -162,9 +162,10 @@ if __name__ == '__main__':
     
     elif "cpen455" in args.dataset:
         ds_transforms = transforms.Compose([transforms.Resize((32, 32)), rescaling])
+        ds_transforms_train = transforms.Compose([transforms.Resize((32, 32)), rescaling, RandomHorizontalFlip(), RandomVerticalFlip(), RandomAdjustSharpness(2), GaussianBlur(kernel_size=(3, 3), sigma=(0.1, 5.0))])
         train_loader = torch.utils.data.DataLoader(CPEN455Dataset(root_dir=args.data_dir, 
                                                                   mode = 'train', 
-                                                                  transform=ds_transforms), 
+                                                                  transform=ds_transforms_train), 
                                                    batch_size=args.batch_size, 
                                                    shuffle=True, 
                                                    **kwargs)

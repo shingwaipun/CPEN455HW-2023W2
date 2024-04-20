@@ -101,7 +101,7 @@ def discretized_mix_logistic_loss(x, l, isbatch=True):
     if isbatch:
         return -torch.sum(log_sum_exp(log_probs))
     else:
-        return -torch.sum(log_sum_exp(log_probs), dim=(1, 2))
+        return -torch.sum(log_sum_exp(log_probs), dim=[1, 2])
    
 
 
