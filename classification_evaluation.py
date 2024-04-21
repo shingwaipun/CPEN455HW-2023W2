@@ -96,6 +96,7 @@ def classifier(model, data_loader, device):
     
     return acc_tracker.get_ratio()
 
+
         
 
 if __name__ == '__main__':
@@ -125,7 +126,7 @@ if __name__ == '__main__':
     #You should replace the random classifier with your trained model
     #Begin of your code
     #coded with the use of github copilot with existing code and comments for prompts
-    model = PixelCNN(nr_resnet=2, nr_filters=40, input_channels=3, nr_logistic_mix=5)
+    model = PixelCNN(nr_resnet=6, nr_filters=64, input_channels=3, nr_logistic_mix=10)
     
     #End of your code
     
