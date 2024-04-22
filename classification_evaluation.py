@@ -21,41 +21,10 @@ NUM_CLASSES = len(my_bidict)
 # And get the predicted label, which is a tensor of shape (batch_size,)
 # Begin of your code
 def get_label(model, model_input, device):
+    # written with the help of github copilot
     # #run the forward pass for each class
     # #return the class with the highest probability
 
-    # outputs = torch.zeros(model_input.shape[0], NUM_CLASSES).to(device)
-    # #print(outputs.shape)
-
-    # returnvec = torch.zeros(model_input.shape[0], dtype=torch.int64).to(device)
-    # #print(returnvec.shape)
-
-    # #repeat the model input for each class
-    # x = model_input.repeat(NUM_CLASSES, 1, 1, 1)
-    # #generate labels list of length batch_size using repeat_interleave
-    # labels = torch.arange(NUM_CLASSES).repeat_interleave(model_input.shape[0]).to(device)
-
-    # output = model(x, labels)
-
-    # loss = discretized_mix_logistic_loss(x, output, isbatch=False)
-    # outputs = loss.view(-1, NUM_CLASSES)
-
-    
-    # return torch.argmin(outputs, dim=1), outputs
-
-
-    # # #iterate over the classes
-    # # for i in range(NUM_CLASSES):
-    # #     #generate labels list of length batch_size
-    # #     labels = torch.tensor([i]*model_input.shape[0], dtype=torch.int64).to(device)
-    # #     #run the forward pass
-    # #     output = model(model_input, labels)
-        
-    # #     loss = discretized_mix_logistic_loss(model_input, output, isbatch=False)
-    # #     outputs[:, i] = loss
-
-    # #get the class with the lowest loss
-    # returnvec = torch.argmin(outputs, dim=1)
 
     # return returnvec
     outputs = torch.zeros(model_input.shape[0], NUM_CLASSES).to(device)

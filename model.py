@@ -96,6 +96,7 @@ class PixelCNN(nn.Module):
         self.nin_out = nin(nr_filters, num_mix * nr_logistic_mix)
         self.init_padding = None
 
+        #written with the se of github copilot
         #embedding
         self.embedding = nn.Embedding(4, nr_filters) # 4 classes, nr_filters dimensions
 
@@ -132,6 +133,7 @@ class PixelCNN(nn.Module):
         u  = u_list.pop()
         ul = ul_list.pop()
 
+        #written with the use of github copilot
         #add middle embeddings
         u = u + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(u.size())
         ul = ul + self.embedding(labels).unsqueeze(-1).unsqueeze(-1).expand(ul.size())
